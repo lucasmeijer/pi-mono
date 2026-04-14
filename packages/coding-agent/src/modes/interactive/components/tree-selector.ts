@@ -1,3 +1,4 @@
+import type { AssistantMessage } from "@mariozechner/pi-ai";
 import {
 	type Component,
 	Container,
@@ -12,6 +13,7 @@ import {
 } from "@mariozechner/pi-tui";
 import type { SessionTreeNode } from "../../../core/session-manager.js";
 import { theme } from "../theme/theme.js";
+import { hasPrimaryAssistantContent } from "./assistant-message-content.js";
 import { DynamicBorder } from "./dynamic-border.js";
 import { keyHint, keyText } from "./keybinding-hints.js";
 
@@ -284,14 +286,11 @@ class TreeList implements Component {
 			const entry = flatNode.node.entry;
 			const isCurrentLeaf = entry.id === this.currentLeafId;
 
-			// Skip assistant messages with only tool calls (no text) unless error/aborted
-			// Always show current leaf so active position is visible
+			// Skip assistant messages without primary content (for example thinking-only
+			// or tool-only states). Always show current leaf so active position is visible.
 			if (entry.type === "message" && entry.message.role === "assistant" && !isCurrentLeaf) {
-				const msg = entry.message as { stopReason?: string; content?: unknown };
-				const hasText = this.hasTextContent(msg.content);
-				const isErrorOrAborted = msg.stopReason && msg.stopReason !== "stop" && msg.stopReason !== "toolUse";
-				// Only hide if no text AND not an error/aborted message
-				if (!hasText && !isErrorOrAborted) {
+				const message = entry.message as AssistantMessage;
+				if (!hasPrimaryAssistantContent(message)) {
 					return false;
 				}
 			}
@@ -824,19 +823,6 @@ class TreeList implements Component {
 			return result;
 		}
 		return "";
-	}
-
-	private hasTextContent(content: unknown): boolean {
-		if (typeof content === "string") return content.trim().length > 0;
-		if (Array.isArray(content)) {
-			for (const c of content) {
-				if (typeof c === "object" && c !== null && "type" in c && c.type === "text") {
-					const text = (c as { text?: string }).text;
-					if (text && text.trim().length > 0) return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	private formatToolCall(name: string, args: Record<string, unknown>): string {
