@@ -7,6 +7,10 @@
 - Added support for multiple `--append-system-prompt` flags, each value is appended to the system prompt separated by double newlines ([#3169](https://github.com/badlogic/pi-mono/pull/3169) by [@aliou](https://github.com/aliou))
 - Added interactive keybinding support for Kitty `super`-modified shortcuts such as `super+k`, `super+enter`, and `ctrl+super+k` ([#3111](https://github.com/badlogic/pi-mono/pull/3111) by [@sudosubin](https://github.com/sudosubin))
 
+### Fixed
+
+- Added OSC 133 semantic zone markers to assistant messages, making them navigation targets for `Super+Shift+Up` in terminals such as Ghostty.
+
 ## [0.67.1] - 2026-04-13
 
 ### Telemetry

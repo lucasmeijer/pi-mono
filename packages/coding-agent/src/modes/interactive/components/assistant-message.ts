@@ -1,6 +1,8 @@
 import type { AssistantMessage } from "@mariozechner/pi-ai";
 import { Container, Markdown, type MarkdownTheme, Spacer, Text } from "@mariozechner/pi-tui";
 import { getMarkdownTheme, theme } from "../theme/theme.js";
+import { hasPrimaryAssistantContent } from "./assistant-message-content.js";
+import { markOsc133Zone } from "./osc133.js";
 
 /**
  * Component that renders a complete assistant message
@@ -11,6 +13,7 @@ export class AssistantMessageComponent extends Container {
 	private markdownTheme: MarkdownTheme;
 	private hiddenThinkingLabel: string;
 	private lastMessage?: AssistantMessage;
+	private isStillStreaming: boolean;
 
 	constructor(
 		message?: AssistantMessage,
@@ -23,6 +26,7 @@ export class AssistantMessageComponent extends Container {
 		this.hideThinkingBlock = hideThinkingBlock;
 		this.markdownTheme = markdownTheme;
 		this.hiddenThinkingLabel = hiddenThinkingLabel;
+		this.isStillStreaming = message === undefined;
 
 		// Container for text/thinking content
 		this.contentContainer = new Container();
@@ -52,6 +56,18 @@ export class AssistantMessageComponent extends Container {
 		if (this.lastMessage) {
 			this.updateContent(this.lastMessage);
 		}
+	}
+
+	override render(width: number): string[] {
+		const lines = super.render(width);
+		if (!this.lastMessage || !hasPrimaryAssistantContent(this.lastMessage)) {
+			return lines;
+		}
+		return markOsc133Zone(lines, { close: !this.isStillStreaming });
+	}
+
+	markStreamingComplete(): void {
+		this.isStillStreaming = false;
 	}
 
 	updateContent(message: AssistantMessage): void {
