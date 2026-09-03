@@ -22,6 +22,24 @@ describe("SettingsSelectorComponent", () => {
 		harness = undefined;
 	});
 
+	it("renders the settings screen with the full rainbow palette", () => {
+		const config = {
+			defaultModel: "not set",
+			availableDefaultModels: [],
+			availableThinkingLevels: [],
+			modelThinkingLevels: {},
+			availableThemes: [],
+			warnings: {},
+		} as unknown as SettingsConfig;
+		const callbacks = { onCancel: () => {} } as unknown as SettingsCallbacks;
+
+		const output = new SettingsSelectorComponent(config, callbacks).render(100).join("\n");
+		const colors = output.match(/\x1b\[38;(?:2;\d+;\d+;\d+|5;\d+)m/g) ?? [];
+
+		expect(new Set(colors).size).toBe(7);
+		expect(stripAnsi(output)).toContain("Auto-compact");
+	});
+
 	it("cycles through fullscreen settings", () => {
 		const onExitOutputChange = vi.fn();
 		const onScrollbarChange = vi.fn();

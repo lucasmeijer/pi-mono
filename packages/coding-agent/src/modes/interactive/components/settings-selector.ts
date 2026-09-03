@@ -19,7 +19,7 @@ import type {
 	TuiMode,
 	WarningSettings,
 } from "../../../core/settings-manager.ts";
-import { getSettingsListTheme, parseAutoThemeSetting, type TerminalTheme, theme } from "../theme/theme.ts";
+import { getRainbowSettingsListTheme, parseAutoThemeSetting, rainbowText, type TerminalTheme } from "../theme/theme.ts";
 import { DynamicBorder } from "./dynamic-border.ts";
 import { keyDisplayText } from "./keybinding-hints.ts";
 import { SelectSubmenu, SteppedSubmenu, type SteppedSubmenuStep } from "./settings-submenu.ts";
@@ -151,7 +151,7 @@ class WarningSettingsSubmenu extends Container {
 		this.settingsList = new SettingsList(
 			items,
 			Math.min(items.length, 10),
-			getSettingsListTheme(),
+			getRainbowSettingsListTheme(),
 			(id, newValue) => {
 				switch (id) {
 					case "anthropic-extra-usage":
@@ -185,10 +185,6 @@ function modelThinkingOverridesSummary(overrides: Record<string, ThinkingLevel>)
 	const count = Object.keys(overrides).length;
 	if (count === 0) return "none";
 	return `${count} configured`;
-}
-
-function modelItemLabel(model: Model<any>): string {
-	return `${model.id} ${theme.fg("muted", `[${model.provider}]`)}`;
 }
 
 function themeItems(availableThemes: string[], currentTheme: string): SelectItem[] {
@@ -312,10 +308,10 @@ class ThemeSubmenu extends Container {
 	private showAutomaticMenu(): void {
 		this.mode = "automatic";
 		const content = new Container();
-		content.addChild(new Text(theme.bold(theme.fg("accent", "Automatic Theme")), 0, 0));
+		content.addChild(new Text(rainbowText("Automatic Theme"), 0, 0));
 		content.addChild(new Spacer(1));
-		content.addChild(new Text(theme.fg("muted", "Choose themes for terminal light and dark appearance."), 0, 0));
-		content.addChild(new Text(theme.fg("muted", "Light/dark detection requires terminal support."), 0, 0));
+		content.addChild(new Text(rainbowText("Choose themes for terminal light and dark appearance."), 0, 0));
+		content.addChild(new Text(rainbowText("Light/dark detection requires terminal support."), 0, 0));
 		content.addChild(new Spacer(1));
 
 		const items: SettingItem[] = [
@@ -374,7 +370,7 @@ class ThemeSubmenu extends Container {
 		const settingsList = new SettingsList(
 			items,
 			Math.min(items.length, 10),
-			getSettingsListTheme(),
+			getRainbowSettingsListTheme(),
 			(id) => {
 				switch (id) {
 					case "single-mode":
@@ -599,7 +595,7 @@ export class SettingsSelectorComponent extends Container {
 									const override = currentModelThinkingLevels[key];
 									return {
 										value: key,
-										label: modelItemLabel(model),
+										label: modelDisplayLabel(model),
 										description: override ?? undefined,
 									};
 								});
@@ -820,13 +816,13 @@ export class SettingsSelectorComponent extends Container {
 			values: ["true", "false"],
 		});
 
-		// Add borders
-		this.addChild(new DynamicBorder());
+		// Add rainbow borders
+		this.addChild(new DynamicBorder(rainbowText));
 
 		this.settingsList = new SettingsList(
 			items,
 			10,
-			getSettingsListTheme(),
+			getRainbowSettingsListTheme(),
 			(id, newValue) => {
 				switch (id) {
 					case "autocompact":
@@ -936,7 +932,7 @@ export class SettingsSelectorComponent extends Container {
 		);
 
 		this.addChild(this.settingsList);
-		this.addChild(new DynamicBorder());
+		this.addChild(new DynamicBorder(rainbowText));
 	}
 
 	getSettingsList(): SettingsList {

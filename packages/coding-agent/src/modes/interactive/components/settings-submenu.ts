@@ -10,7 +10,7 @@ import {
 	Spacer,
 	Text,
 } from "@earendil-works/pi-tui";
-import { getSelectListTheme, theme } from "../theme/theme.ts";
+import { getRainbowSelectListTheme, rainbowText } from "../theme/theme.ts";
 
 const SUBMENU_SELECT_LIST_LAYOUT: SelectListLayoutOptions = {
 	minPrimaryColumnWidth: 12,
@@ -57,12 +57,12 @@ export class SelectSubmenu extends Container {
 		this.onSelectionChangeCb = onSelectionChange;
 
 		// Title
-		this.addChild(new Text(theme.bold(theme.fg("accent", title)), 0, 0));
+		this.addChild(new Text(rainbowText(title), 0, 0));
 
 		// Description
 		if (description) {
 			this.addChild(new Spacer(1));
-			this.addChild(new Text(theme.fg("muted", description), 0, 0));
+			this.addChild(new Text(rainbowText(description), 0, 0));
 		}
 
 		// Search input
@@ -88,11 +88,11 @@ export class SelectSubmenu extends Container {
 		const hint = submenuOptions?.searchable
 			? "  Type to filter \u00b7 Enter to select \u00b7 Esc to go back"
 			: "  Enter to select \u00b7 Esc to go back";
-		this.addChild(new Text(theme.fg("dim", hint), 0, 0));
+		this.addChild(new Text(rainbowText(hint), 0, 0));
 	}
 
 	private buildSelectList(options: SelectItem[], preselect: string): SelectList {
-		const list = new SelectList(options, Math.min(options.length, 10), getSelectListTheme(), this.listLayout);
+		const list = new SelectList(options, Math.min(options.length, 10), getRainbowSelectListTheme(), this.listLayout);
 
 		const idx = options.findIndex((o) => o.value === preselect);
 		if (idx !== -1) list.setSelectedIndex(idx);

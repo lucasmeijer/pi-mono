@@ -1334,3 +1334,31 @@ export function getSettingsListTheme(): SettingsListTheme {
 		hint: (text: string) => theme.fg("dim", text),
 	};
 }
+
+const RAINBOW_COLORS = ["#ff5f5f", "#ffaf00", "#ffff00", "#5fff87", "#00d7ff", "#5f87ff", "#af5fff"];
+
+/** Color every character with the next color in a repeating rainbow. */
+export function rainbowText(text: string): string {
+	const colors = RAINBOW_COLORS.map((color) => fgAnsi(color, theme.getColorMode()));
+	return `${[...text].map((character, index) => `${colors[index % colors.length]}${character}`).join("")}\x1b[39m`;
+}
+
+export function getRainbowSelectListTheme(): SelectListTheme {
+	return {
+		selectedPrefix: rainbowText,
+		selectedText: rainbowText,
+		description: rainbowText,
+		scrollInfo: rainbowText,
+		noMatch: rainbowText,
+	};
+}
+
+export function getRainbowSettingsListTheme(): SettingsListTheme {
+	return {
+		label: rainbowText,
+		value: rainbowText,
+		description: rainbowText,
+		cursor: rainbowText("→ "),
+		hint: rainbowText,
+	};
+}
