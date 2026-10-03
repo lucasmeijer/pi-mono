@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { openaiCodexOAuth } from "../src/auth/oauth/openai-codex.ts";
+import { setClientName } from "../src/utils/pi-user-agent.ts";
 
 const neverAbortedSignal = new AbortController().signal;
 
@@ -72,6 +73,27 @@ describe("OpenAI Codex OAuth", () => {
 		vi.restoreAllMocks();
 		vi.unstubAllGlobals();
 		vi.useRealTimers();
+		setClientName("pi");
+	});
+
+	it("uses the configured client name as the browser login originator", async () => {
+		setClientName("my-app");
+		let authUrl: string | undefined;
+
+		await expect(
+			openaiCodexOAuth.login({
+				signal: neverAbortedSignal,
+				prompt: async (prompt) => {
+					if (prompt.type === "select") return "browser";
+					throw new Error("Login cancelled");
+				},
+				notify: (event) => {
+					if (event.type === "auth_url") authUrl = event.url;
+				},
+			}),
+		).rejects.toThrow("Login cancelled");
+
+		expect(new URL(authUrl!).searchParams.get("originator")).toBe("my-app");
 	});
 
 	it("logs in with the OpenAI Codex device code flow", async () => {

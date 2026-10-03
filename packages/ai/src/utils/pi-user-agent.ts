@@ -14,6 +14,22 @@ function loadNodeOs(): typeof NodeOs | null {
 // Keep runtime OS loading browser-safe. A top-level runtime import of node:os breaks browser/Vite builds.
 const nodeOs = loadNodeOs();
 
+let clientName = "pi";
+
+/**
+ * Set the client name pi-ai reports to providers: the User-Agent product name and the
+ * OpenAI Codex `originator`. Defaults to "pi".
+ */
+export function setClientName(name: string): void {
+	clientName = name;
+}
+
+export function getClientName(): string {
+	return clientName;
+}
+
 export function getPiUserAgent(): string {
-	return nodeOs ? `pi (${nodeOs.platform()} ${nodeOs.release()}; ${nodeOs.arch()})` : "pi (browser)";
+	return nodeOs
+		? `${clientName} (${nodeOs.platform()} ${nodeOs.release()}; ${nodeOs.arch()})`
+		: `${clientName} (browser)`;
 }
