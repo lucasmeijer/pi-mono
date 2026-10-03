@@ -27,6 +27,7 @@ afterEach(() => {
 	resetOpenAICodexWebSocketDebugStats();
 	vi.useRealTimers();
 	vi.restoreAllMocks();
+	setClientName("pi");
 });
 
 function mockToken(accountId = "acc_test"): string {
@@ -251,11 +252,7 @@ describe("openai-codex streaming", () => {
 		};
 
 		setClientName("my-app");
-		try {
-			await streamOpenAICodexResponses(model, context, { apiKey: token, transport: "sse" }).result();
-		} finally {
-			setClientName("pi");
-		}
+		await streamOpenAICodexResponses(model, context, { apiKey: token, transport: "sse" }).result();
 
 		expect(requestHeaders?.get("originator")).toBe("my-app");
 		expect(requestHeaders?.get("User-Agent")).toBe(`my-app (${platform()} ${release()}; ${arch()})`);
